@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		507F8042A7DE3429A854BF58 /* CameraViewWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507F8F95C490AF1F341380FB /* CameraViewWrapper.swift */; };
-		507F8190BE981656214D9547 /* CameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507F8845FFEBB6D5870DA948 /* CameraViewController.swift */; };
 		507F8892A6D5962B66FF5A41 /* CameraBaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507F873B1790CF5C8635A556 /* CameraBaseView.swift */; };
 		507F8C1E57E62CB0732EC587 /* ShootingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507F855E354D1F0C7D22A655 /* ShootingViewModel.swift */; };
 		507F8D7F763B8B25CDF18E04 /* DebugLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507F8417404B0E5C3859536F /* DebugLog.swift */; };
@@ -22,7 +21,6 @@
 		507F8417404B0E5C3859536F /* DebugLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DebugLog.swift; sourceTree = "<group>"; };
 		507F855E354D1F0C7D22A655 /* ShootingViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShootingViewModel.swift; sourceTree = "<group>"; };
 		507F873B1790CF5C8635A556 /* CameraBaseView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraBaseView.swift; sourceTree = "<group>"; };
-		507F8845FFEBB6D5870DA948 /* CameraViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraViewController.swift; sourceTree = "<group>"; };
 		507F8F95C490AF1F341380FB /* CameraViewWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraViewWrapper.swift; sourceTree = "<group>"; };
 		5D9C4B71271021FF00B9195A /* iOSCameraResearch4SwiftUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOSCameraResearch4SwiftUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D9C4B74271021FF00B9195A /* iOSCameraResearch4SwiftUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSCameraResearch4SwiftUIApp.swift; sourceTree = "<group>"; };
@@ -71,7 +69,6 @@
 				507F8F95C490AF1F341380FB /* CameraViewWrapper.swift */,
 				507F855E354D1F0C7D22A655 /* ShootingViewModel.swift */,
 				507F8417404B0E5C3859536F /* DebugLog.swift */,
-				507F8845FFEBB6D5870DA948 /* CameraViewController.swift */,
 			);
 			path = iOSCameraResearch4SwiftUI;
 			sourceTree = "<group>";
@@ -160,7 +157,6 @@
 				507F8042A7DE3429A854BF58 /* CameraViewWrapper.swift in Sources */,
 				507F8C1E57E62CB0732EC587 /* ShootingViewModel.swift in Sources */,
 				507F8D7F763B8B25CDF18E04 /* DebugLog.swift in Sources */,
-				507F8190BE981656214D9547 /* CameraViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
