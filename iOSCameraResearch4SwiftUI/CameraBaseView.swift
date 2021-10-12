@@ -7,7 +7,6 @@ struct CameraBaseView: View {
         GeometryReader { geometry in
             ZStack {
                 CameraViewWrapper(geometrySize: geometry.size).environmentObject(shootingVM)
-
                 VStack(alignment: .trailing) {
                     Spacer().frame(height: 10)
                     HStack(alignment: .top) {
@@ -22,6 +21,42 @@ struct CameraBaseView: View {
                         Spacer().frame(width: 30)
                     }
                     Spacer()
+                }
+
+                if shootingVM.fixedOrientation == .landscapeLeft {
+                    HStack {
+                        Spacer()
+                        Button(action: {
+                            shootingVM.shooting()
+                        }) {
+                            Circle()
+                                .fill(Color.white)
+                                .frame(width: 50, height: 50)
+                                .padding(10)
+                        }
+                    }
+                } else if shootingVM.fixedOrientation == .landscapeRight {
+                    Button(action: {
+                        shootingVM.shooting()
+                    }) {
+                        Circle()
+                            .fill(Color.white)
+                            .frame(width: 50, height: 50)
+                            .padding(10)
+                    }
+                    Spacer()
+                } else {
+                    VStack {
+                        Spacer()
+                        Button(action: {
+                            shootingVM.shooting()
+                        }) {
+                            Circle()
+                                .fill(Color.white)
+                                .frame(width: 50, height: 50)
+                                .padding(10)
+                        }
+                    }
                 }
             }
         }

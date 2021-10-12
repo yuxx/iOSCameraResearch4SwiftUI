@@ -4,7 +4,13 @@ import UIKit
 import CoreMotion
 import SwiftUI
 
-final class ShootingViewModel: ObservableObject {
+protocol CameraViewDeinitDelegate {
+    func deinitProc() -> Void
+    func adjustAutoFocus(focusPoint: CGPoint, focusMode: AVCaptureDevice.FocusMode, exposeMode: AVCaptureDevice.ExposureMode)
+    func resetPreviewLayerFrame()
+}
+
+final class ShootingViewModel: NSObject, ObservableObject {
     @Published var isShooting: Bool = false
     private var defaultCameraSide: CameraSide
     private var currentCameraSide: CameraSide
@@ -20,9 +26,6 @@ final class ShootingViewModel: ObservableObject {
 
     private var photoOut: AVCapturePhotoOutput?
 
-    let focusIndicator: UIView = UIView()
-    let coreMotionManager: CMMotionManager = CMMotionManager()
-
     private var exZoomFactor: CGFloat = 1.0
 
     var currentOrientation: AVCaptureVideoOrientation = .portrait {
@@ -34,6 +37,8 @@ final class ShootingViewModel: ObservableObject {
         }
     }
 
+    var cameraViewDeinitDelegate: CameraViewDeinitDelegate?
+
     init(defaultCameraSide: CameraSide, frontCameraMode: FrontCameraMode?, backCameraMode: BackCameraMode?) {
         debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
             + "\ndefaultCameraSide: \(defaultCameraSide)"
@@ -44,6 +49,8 @@ final class ShootingViewModel: ObservableObject {
         currentCameraSide = defaultCameraSide
         self.frontCameraMode = frontCameraMode
         self.backCameraMode = backCameraMode
+
+        super.init()
 
         switch defaultCameraSide {
         case .front:
@@ -62,17 +69,35 @@ final class ShootingViewModel: ObservableObject {
 
         setupAVCaptureDevice()
         setupCameraIO()
-//        setupPreviewLayer() // todo: CameraViewWrapper でやる
-        // todo:
+
+        // NOTE: 回転時の通知を設定して videoOrientation を変更
+        NotificationCenter.default.addObserver(self, selector: #selector(onOrientationChanged), name: UIDevice.orientationDidChangeNotification, object: nil)
+    }
+
+    @objc private func onOrientationChanged() {
+        let orientation = UIDevice.current.orientation
+        guard orientation == .portrait || orientation == .landscapeLeft || orientation == .landscapeRight else {
+            debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
+                + "\nupside down is not supported."
+                + "\norientation: \(orientation)"
+                , level: .err)
+            return
+        }
+        adjustOrientationForAVCaptureVideoOrientation()
+
+        if let cameraViewDeinitDelegate = cameraViewDeinitDelegate {
+            cameraViewDeinitDelegate.resetPreviewLayerFrame()
+        }
     }
 
     deinit {
-        if coreMotionManager.isAccelerometerActive {
-            coreMotionManager.stopAccelerometerUpdates()
+        if let cameraViewDeinitDelegate = cameraViewDeinitDelegate {
+            cameraViewDeinitDelegate.deinitProc()
         }
     }
 }
 
+// MARK: init stuff
 extension ShootingViewModel {
     private func setupAVCaptureDevice() {
         debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
@@ -175,10 +200,8 @@ extension ShootingViewModel {
                     , level: .err)
                 return
             }
-debuglog("\(String(describing: Self.self))::\(#function)@\(#line)", level: .dbg)
             photoOut.setPreparedPhotoSettingsArray([AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.jpeg])])
             if captureSession.canAddOutput(photoOut) {
-debuglog("\(String(describing: Self.self))::\(#function)@\(#line)", level: .dbg)
                 captureSession.addOutput(photoOut)
             }
         } catch {
@@ -186,10 +209,58 @@ debuglog("\(String(describing: Self.self))::\(#function)@\(#line)", level: .dbg)
                 + "\nerror: \(error)"
                 , level: .err)
         }
-debuglog("\(String(describing: Self.self))::\(#function)@\(#line)", level: .dbg)
         captureSession.startRunning()
     }
 
+}
+
+// MARK: shooting stuff
+extension ShootingViewModel {
+    func shooting() {
+        let settings = AVCapturePhotoSettings()
+        // NOTE: オートフラッシュ
+        settings.flashMode = .auto
+        // NOTE: 手ブレ補正 ON(deprecated??)
+        settings.isAutoStillImageStabilizationEnabled = true
+        settings.photoQualityPrioritization = .speed
+        guard let photoOut = photoOut else {
+            debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
+                + "\nphotoOut is nil"
+                , level: .err)
+            return
+        }
+        photoOut.capturePhoto(with: settings, delegate: self)
+    }
+}
+
+extension ShootingViewModel: AVCapturePhotoCaptureDelegate {
+    /// 撮影直後のコールバック
+    public func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
+        if let error = error {
+            debuglog("\(String(describing: Self.self))::\(#function)@\(#line)\terror: \(error)", level: .err)
+            return
+        }
+        if let imageData = photo.fileDataRepresentation() {
+            guard let uiImage = UIImage(data: imageData) else {
+                debuglog("\(String(describing: Self.self))::\(#function)@\(#line)", level: .err)
+                return
+            }
+            // NOTE: 回転を調整
+            let orientationAdjustedImage: UIImage
+            switch currentOrientation {
+            case .landscapeRight:
+                orientationAdjustedImage = UIImage(cgImage: uiImage.cgImage!, scale: uiImage.scale, orientation: .up)
+            case .landscapeLeft:
+                orientationAdjustedImage = UIImage(cgImage: uiImage.cgImage!, scale: uiImage.scale, orientation: .down)
+            case .portrait, .portraitUpsideDown: fallthrough
+            @unknown default:
+                orientationAdjustedImage = uiImage
+            }
+
+            // NOTE: フォトライブラリへ保存
+            UIImageWriteToSavedPhotosAlbum(orientationAdjustedImage, nil, nil, nil)
+        }
+    }
 }
 
 extension ShootingViewModel {
@@ -213,14 +284,35 @@ extension ShootingViewModel {
         }()
         currentOrientation = newOrientation
     }
+    var fixedOrientation: UIDeviceOrientation {
+        switch currentOrientation {
+        case .portrait:
+            return .portrait
+        case .portraitUpsideDown:
+            return .portraitUpsideDown
+        case .landscapeRight:
+            // NOTE: デバイスの向きはカメラの左右と逆
+            return .landscapeLeft
+        case .landscapeLeft:
+            // NOTE: デバイスの向きはカメラの左右と逆
+            return .landscapeRight
+        @unknown default:
+            return .portrait
+        }
+    }
 }
 
-
+// MARK: gesture stuff
 extension ShootingViewModel {
     @objc func tapGesture(_ gesture: UITapGestureRecognizer) {
+        let tappedPoint = gesture.location(in: gesture.view)
         debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
             + "\ngesture.view?.frame: \(gesture.view?.frame)"
+            + "\ntappedPoint: \(tappedPoint)"
             , level: .dbg)
+        if let cameraViewDeinitDelegate = cameraViewDeinitDelegate {
+            cameraViewDeinitDelegate.adjustAutoFocus(focusPoint: tappedPoint, focusMode: .autoFocus, exposeMode: .autoExpose)
+        }
     }
 
     @objc func pinchGesture(_ gesture: UIPinchGestureRecognizer) {
@@ -228,6 +320,60 @@ extension ShootingViewModel {
             + "\ngesture.scale: \(gesture.scale)"
             + "\ngesture.velocity: \(gesture.velocity)"
             , level: .dbg)
+        modifyZoomFactor(byScale: gesture.scale, isFix: gesture.state == UIPinchGestureRecognizer.State.ended)
+    }
+
+    // ref: https://qiita.com/touyu/items/6fd26a35212e75f98c6b
+    private func modifyZoomFactor(byScale pinchScale: CGFloat, isFix: Bool) {
+        guard let currentCamera = currentCamera else {
+            debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
+                + "\nNo active camera found."
+                , level: .err)
+            return
+        }
+        do {
+            try currentCamera.lockForConfiguration()
+        } catch {
+            debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
+                + "\nfailed to lock for configuration for current camera."
+                , level: .err)
+            return
+        }
+
+        var newZoomFactor: CGFloat = currentCamera.videoZoomFactor
+        defer {
+            currentCamera.videoZoomFactor = newZoomFactor
+            currentCamera.unlockForConfiguration()
+        }
+
+        if pinchScale > 1.0 {
+            newZoomFactor = exZoomFactor + pinchScale - 1
+        } else {
+            newZoomFactor = exZoomFactor - (1 - pinchScale) * exZoomFactor
+        }
+
+        if newZoomFactor < currentCamera.minAvailableVideoZoomFactor {
+            newZoomFactor = currentCamera.minAvailableVideoZoomFactor
+            debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
+                + "\nVideo scale factor capped to \(newZoomFactor)."
+                , level: .dbg)
+        } else if newZoomFactor > currentCamera.maxAvailableVideoZoomFactor {
+            newZoomFactor = currentCamera.maxAvailableVideoZoomFactor
+            debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
+                + "\nVideo scale factor capped to \(newZoomFactor)."
+                , level: .dbg)
+        }
+
+        if isFix {
+            debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
+                + "\nFix video scale factor from \(exZoomFactor) to \(newZoomFactor)"
+                + "\n\t\t.videoZoomFactor: \(currentCamera.videoZoomFactor)"
+                + "\n\t\t.minAvailableVideoZoomFactor: \(currentCamera.minAvailableVideoZoomFactor)"
+                + "\n\t\t.maxAvailableVideoZoomFactor: \(currentCamera.maxAvailableVideoZoomFactor)"
+                + "\n\t\t.activeFormat.videoMaxZoomFactor: \(currentCamera.activeFormat.videoMaxZoomFactor)"
+                , level: .dbg)
+            exZoomFactor = newZoomFactor
+        }
     }
 }
 
@@ -280,3 +426,4 @@ extension ShootingViewModel {
         }
     }
 }
+
