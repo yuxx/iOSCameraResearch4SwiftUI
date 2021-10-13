@@ -1,18 +1,18 @@
 import SwiftUI
 
 struct CameraBaseView: View {
-    @EnvironmentObject var shootingVM: ShootingViewModel
+    @EnvironmentObject var cameraVM: CameraViewModel
 
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                CameraViewWrapper(geometrySize: geometry.size).environmentObject(shootingVM)
+                CameraWrapperView(geometrySize: geometry.size).environmentObject(cameraVM)
                 VStack(alignment: .trailing) {
                     Spacer().frame(height: 10)
                     HStack(alignment: .top) {
                         Spacer()
                         Button(action: {
-                            shootingVM.isShooting = false
+                            cameraVM.isShooting = false
                         }) {
                             Image(systemName: "multiply")
                                 .foregroundColor(.white)
@@ -23,11 +23,11 @@ struct CameraBaseView: View {
                     Spacer()
                 }
 
-                if shootingVM.fixedOrientation == .landscapeLeft {
+                if cameraVM.fixedOrientation == .landscapeLeft {
                     HStack {
                         Spacer()
                         Button(action: {
-                            shootingVM.shooting()
+                            cameraVM.shooting()
                         }) {
                             Circle()
                                 .fill(Color.white)
@@ -35,9 +35,9 @@ struct CameraBaseView: View {
                                 .padding(10)
                         }
                     }
-                } else if shootingVM.fixedOrientation == .landscapeRight {
+                } else if cameraVM.fixedOrientation == .landscapeRight {
                     Button(action: {
-                        shootingVM.shooting()
+                        cameraVM.shooting()
                     }) {
                         Circle()
                             .fill(Color.white)
@@ -49,7 +49,7 @@ struct CameraBaseView: View {
                     VStack {
                         Spacer()
                         Button(action: {
-                            shootingVM.shooting()
+                            cameraVM.shooting()
                         }) {
                             Circle()
                                 .fill(Color.white)
@@ -65,8 +65,8 @@ struct CameraBaseView: View {
 }
 
 struct CameraBaseView_Previews: PreviewProvider {
-    static let shootingVM: ShootingViewModel = ShootingViewModel(defaultCameraSide: .back, frontCameraMode: nil, backCameraMode: .normalWideAngle)
+    static let cameraVM: CameraViewModel = CameraViewModel(defaultCameraSide: .back, frontCameraMode: nil, backCameraMode: .normalWideAngle)
     static var previews: some View {
-        CameraBaseView().environmentObject(shootingVM)
+        CameraBaseView().environmentObject(cameraVM)
     }
 }

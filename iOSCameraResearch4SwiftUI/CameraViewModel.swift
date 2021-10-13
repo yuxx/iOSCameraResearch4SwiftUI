@@ -10,8 +10,12 @@ protocol CameraViewDeinitDelegate {
     func resetPreviewLayerFrame()
 }
 
-final class ShootingViewModel: NSObject, ObservableObject {
-    @Published var isShooting: Bool = false
+final class CameraViewModel: NSObject, ObservableObject {
+    @Published var isShooting: Bool = false {
+        didSet {
+            previewLayer = nil
+        }
+    }
     private var defaultCameraSide: CameraSide
     private var currentCameraSide: CameraSide
     private var frontCameraMode: FrontCameraMode?
@@ -22,7 +26,7 @@ final class ShootingViewModel: NSObject, ObservableObject {
     private var frontCamera: AVCaptureDevice?
     private(set) var currentCamera: AVCaptureDevice?
 
-    @Published var previewLayer: AVCaptureVideoPreviewLayer?
+    var previewLayer: AVCaptureVideoPreviewLayer?
 
     private var photoOut: AVCapturePhotoOutput?
 
@@ -98,7 +102,7 @@ final class ShootingViewModel: NSObject, ObservableObject {
 }
 
 // MARK: init stuff
-extension ShootingViewModel {
+extension CameraViewModel {
     private func setupAVCaptureDevice() {
         debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
             + "\nAVCaptureDevice.DeviceType"
@@ -211,11 +215,10 @@ extension ShootingViewModel {
         }
         captureSession.startRunning()
     }
-
 }
 
 // MARK: shooting stuff
-extension ShootingViewModel {
+extension CameraViewModel {
     func shooting() {
         let settings = AVCapturePhotoSettings()
         // NOTE: オートフラッシュ
@@ -233,7 +236,7 @@ extension ShootingViewModel {
     }
 }
 
-extension ShootingViewModel: AVCapturePhotoCaptureDelegate {
+extension CameraViewModel: AVCapturePhotoCaptureDelegate {
     /// 撮影直後のコールバック
     public func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         if let error = error {
@@ -263,7 +266,8 @@ extension ShootingViewModel: AVCapturePhotoCaptureDelegate {
     }
 }
 
-extension ShootingViewModel {
+// MARK: adjust orientation stuff
+extension CameraViewModel {
     func adjustOrientationForAVCaptureVideoOrientation() {
         let newOrientation: AVCaptureVideoOrientation = {
             switch UIDevice.current.orientation {
@@ -300,10 +304,22 @@ extension ShootingViewModel {
             return .portrait
         }
     }
+    // ref: https://stackoverflow.com/a/35490266/15474670
+    var captureResolution: CGSize {
+        guard let formatDescription = currentCamera?.activeFormat.formatDescription else {
+            return CGSize(width: 0, height: 0)
+        }
+        let dimensions = CMVideoFormatDescriptionGetDimensions(formatDescription)
+        let isPortrait = currentOrientation == .portrait || currentOrientation == .portraitUpsideDown
+        guard isPortrait else {
+            return CGSize(width: CGFloat(dimensions.width), height: CGFloat(dimensions.height))
+        }
+        return CGSize(width: CGFloat(dimensions.height), height: CGFloat(dimensions.width))
+    }
 }
 
 // MARK: gesture stuff
-extension ShootingViewModel {
+extension CameraViewModel {
     @objc func tapGesture(_ gesture: UITapGestureRecognizer) {
         let tappedPoint = gesture.location(in: gesture.view)
         debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
@@ -378,14 +394,14 @@ extension ShootingViewModel {
 }
 
 
-extension ShootingViewModel {
+extension CameraViewModel {
     enum CameraSide {
         case front
             , back
     }
 }
 
-extension ShootingViewModel {
+extension CameraViewModel {
     enum FrontCameraMode {
         case normalWideAngle
             , trueDepth
@@ -400,7 +416,7 @@ extension ShootingViewModel {
     }
 }
 
-extension ShootingViewModel {
+extension CameraViewModel {
     enum BackCameraMode {
         case normalWideAngle
             , dual

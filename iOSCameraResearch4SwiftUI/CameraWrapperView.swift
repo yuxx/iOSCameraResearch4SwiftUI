@@ -2,13 +2,13 @@ import SwiftUI
 import AVFoundation
 import CoreMotion
 
-struct CameraViewWrapper: UIViewRepresentable {
+struct CameraWrapperView: UIViewRepresentable {
     let geometrySize: CGSize
-    @EnvironmentObject var shootingVM: ShootingViewModel
+    @EnvironmentObject var cameraVM: CameraViewModel
 
     private let baseView: UIView = UIView()
-    let focusIndicator: UIView = UIView()
-    let coreMotionManager: CMMotionManager = CMMotionManager()
+    private let focusIndicator: UIView = UIView()
+    private let coreMotionManager: CMMotionManager = CMMotionManager()
 
     func makeUIView(context: Context) -> UIViewType {
         baseView.frame = CGRect(origin: .zero, size: geometrySize)
@@ -26,18 +26,20 @@ struct CameraViewWrapper: UIViewRepresentable {
             + "\nbaseView.bounds:\t\(baseView.bounds)"
             + "\nuiView.frame:\t\(uiView.frame)"
             + "\nuiView.bounds:\t\(uiView.bounds)"
+            + "\ncameraVM.captureResolution:\t\(cameraVM.captureResolution)"
             , level: .dbg)
     }
 }
 
 // MARK: init stuff
-extension CameraViewWrapper {
+extension CameraWrapperView {
     private func setupBaseView() {
-        shootingVM.cameraViewDeinitDelegate = self
+        deinitProc()
+        cameraVM.cameraViewDeinitDelegate = self
 
         setupPreviewLayer()
-        baseView.addGestureRecognizer(UITapGestureRecognizer(target: shootingVM, action: #selector(ShootingViewModel.tapGesture(_:))))
-        baseView.addGestureRecognizer(UIPinchGestureRecognizer(target: shootingVM, action: #selector(ShootingViewModel.pinchGesture(_:))))
+        baseView.addGestureRecognizer(UITapGestureRecognizer(target: cameraVM, action: #selector(CameraViewModel.tapGesture(_:))))
+        baseView.addGestureRecognizer(UIPinchGestureRecognizer(target: cameraVM, action: #selector(CameraViewModel.pinchGesture(_:))))
         baseView.backgroundColor = .gray
 
         setupFocusIndicator()
@@ -46,7 +48,7 @@ extension CameraViewWrapper {
 
     private func setupPreviewLayer() {
         debuglog("\(String(describing: Self.self))::\(#function)@\(#line)", level: .dbg)
-        let newPreviewLayer = AVCaptureVideoPreviewLayer(session: shootingVM.captureSession)
+        let newPreviewLayer = AVCaptureVideoPreviewLayer(session: cameraVM.captureSession)
         newPreviewLayer.videoGravity = .resizeAspect
         debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
             + "\nbaseView.frame:\t\(baseView.frame)"
@@ -55,7 +57,7 @@ extension CameraViewWrapper {
             + "\nnewPreviewLayer.bounds:\t\(newPreviewLayer.bounds)"
             , level: .dbg)
         newPreviewLayer.frame = baseView.frame
-        if let previewLayer = shootingVM.previewLayer {
+        if let previewLayer = cameraVM.previewLayer {
             debuglog("\(String(describing: Self.self))::\(#function)@\(#line)", level: .dbg)
             baseView.layer.replaceSublayer(previewLayer, with: newPreviewLayer)
             // todo: フリップアニメーション ref: https://superhahnah.com/swift-camera-position-switching/
@@ -63,8 +65,8 @@ extension CameraViewWrapper {
             debuglog("\(String(describing: Self.self))::\(#function)@\(#line)", level: .dbg)
             baseView.layer.insertSublayer(newPreviewLayer, at: 0)
         }
-        shootingVM.previewLayer = newPreviewLayer
-        shootingVM.adjustOrientationForAVCaptureVideoOrientation()
+        cameraVM.previewLayer = newPreviewLayer
+        cameraVM.adjustOrientationForAVCaptureVideoOrientation()
     }
 
     private func setupFocusIndicator() {
@@ -115,7 +117,7 @@ extension CameraViewWrapper {
 }
 
 // MARK: CameraViewDeinitDelegate stuff
-extension CameraViewWrapper: CameraViewDeinitDelegate {
+extension CameraWrapperView: CameraViewDeinitDelegate {
     func deinitProc() {
         if coreMotionManager.isAccelerometerActive {
             coreMotionManager.stopAccelerometerUpdates()
@@ -136,7 +138,7 @@ extension CameraViewWrapper: CameraViewDeinitDelegate {
             )
         } completion: { (UIViewAnimatingPosition) in
             debuglog("\(String(describing: Self.self))::\(#function)@\(#line)", level: .dbg)
-            Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { (Timer) in
+            Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { _ in
                 debuglog("\(String(describing: Self.self))::\(#function)@\(#line)", level: .dbg)
                 focusIndicator.isHidden = true
                 focusIndicator.frame.size = CGSize(
@@ -146,7 +148,7 @@ extension CameraViewWrapper: CameraViewDeinitDelegate {
             }
         }
 
-        guard let currentCamera = shootingVM.currentCamera else {
+        guard let currentCamera = cameraVM.currentCamera else {
             debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
                 + "\nNo active camera found."
                 , level: .err)
@@ -164,7 +166,7 @@ extension CameraViewWrapper: CameraViewDeinitDelegate {
             currentCamera.unlockForConfiguration()
         }
 
-        guard let previewLayer = shootingVM.previewLayer else {
+        guard let previewLayer = cameraVM.previewLayer else {
             debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
                 + "\npreview layer is nil."
                 , level: .err)
@@ -188,12 +190,13 @@ extension CameraViewWrapper: CameraViewDeinitDelegate {
     }
 
     func resetPreviewLayerFrame() {
-        guard let previewLayer = shootingVM.previewLayer else {
+        guard let previewLayer = cameraVM.previewLayer else {
             debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
                 + "\npreviewLayer is nil"
                 , level: .err)
             return
         }
+        // todo: adjust base view and preview layer aspect
         previewLayer.frame = baseView.frame
     }
 }

@@ -2,7 +2,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject var viewModel: ShootingViewModel = ShootingViewModel(defaultCameraSide: .back, frontCameraMode: nil, backCameraMode: .normalWideAngle)
+    @StateObject var viewModel: CameraViewModel = CameraViewModel(defaultCameraSide: .back, frontCameraMode: nil, backCameraMode: .normalWideAngle)
     var body: some View {
         Button(action: {
             viewModel.isShooting = true
