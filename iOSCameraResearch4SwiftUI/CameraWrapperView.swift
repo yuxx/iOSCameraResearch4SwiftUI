@@ -7,6 +7,7 @@ struct CameraWrapperView: UIViewRepresentable {
     @EnvironmentObject var cameraVM: CameraViewModel
 
     private let baseView: UIView = UIView()
+    private let previewLayerView: UIView = UIView()
     private let focusIndicator: UIView = UIView()
     private let coreMotionManager: CMMotionManager = CMMotionManager()
 
@@ -24,6 +25,8 @@ struct CameraWrapperView: UIViewRepresentable {
         debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
             + "\nbaseView.frame:\t\(baseView.frame)"
             + "\nbaseView.bounds:\t\(baseView.bounds)"
+            + "\npreviewLayerView.frame:\t\(previewLayerView.frame)"
+            + "\npreviewLayerView.bounds:\t\(previewLayerView.bounds)"
             + "\nuiView.frame:\t\(uiView.frame)"
             + "\nuiView.bounds:\t\(uiView.bounds)"
             + "\ncameraVM.captureResolution:\t\(cameraVM.captureResolution)"
@@ -38,9 +41,10 @@ extension CameraWrapperView {
         cameraVM.cameraViewDeinitDelegate = self
 
         setupPreviewLayer()
-        baseView.addGestureRecognizer(UITapGestureRecognizer(target: cameraVM, action: #selector(CameraViewModel.tapGesture(_:))))
-        baseView.addGestureRecognizer(UIPinchGestureRecognizer(target: cameraVM, action: #selector(CameraViewModel.pinchGesture(_:))))
+        previewLayerView.addGestureRecognizer(UITapGestureRecognizer(target: cameraVM, action: #selector(CameraViewModel.tapGesture(_:))))
+        previewLayerView.addGestureRecognizer(UIPinchGestureRecognizer(target: cameraVM, action: #selector(CameraViewModel.pinchGesture(_:))))
         baseView.backgroundColor = .gray
+        previewLayerView.backgroundColor = .white
 
         setupFocusIndicator()
         startMotionAutoFocus()
@@ -48,33 +52,48 @@ extension CameraWrapperView {
 
     private func setupPreviewLayer() {
         debuglog("\(String(describing: Self.self))::\(#function)@\(#line)", level: .dbg)
+        previewLayerView.frame = baseView.frame
+        baseView.addSubview(previewLayerView)
         let newPreviewLayer = AVCaptureVideoPreviewLayer(session: cameraVM.captureSession)
         newPreviewLayer.videoGravity = .resizeAspect
         debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
             + "\nbaseView.frame:\t\(baseView.frame)"
             + "\nbaseView.bounds:\t\(baseView.bounds)"
+            + "\npreviewLayerView.frame:\t\(previewLayerView.frame)"
+            + "\npreviewLayerView.bounds:\t\(previewLayerView.bounds)"
             + "\nnewPreviewLayer.frame:\t\(newPreviewLayer.frame)"
             + "\nnewPreviewLayer.bounds:\t\(newPreviewLayer.bounds)"
             , level: .dbg)
-        newPreviewLayer.frame = baseView.frame
+        let layerFrame = calcLayerFrame()
+        previewLayerView.frame = layerFrame
+        newPreviewLayer.frame = CGRect(origin: .zero, size: layerFrame.size)
         if let previewLayer = cameraVM.previewLayer {
             debuglog("\(String(describing: Self.self))::\(#function)@\(#line)", level: .dbg)
-            baseView.layer.replaceSublayer(previewLayer, with: newPreviewLayer)
+            previewLayerView.layer.replaceSublayer(previewLayer, with: newPreviewLayer)
             // todo: フリップアニメーション ref: https://superhahnah.com/swift-camera-position-switching/
         } else {
             debuglog("\(String(describing: Self.self))::\(#function)@\(#line)", level: .dbg)
-            baseView.layer.insertSublayer(newPreviewLayer, at: 0)
+            previewLayerView.layer.insertSublayer(newPreviewLayer, at: 0)
         }
         cameraVM.previewLayer = newPreviewLayer
         cameraVM.adjustOrientationForAVCaptureVideoOrientation()
     }
+    private func calcLayerFrame() -> CGRect {
+        let currentImageDimensions = cameraVM.captureResolution
+        guard cameraVM.fixedOrientation == .landscapeRight || cameraVM.fixedOrientation == .landscapeLeft else {
+            let fixedHeight: CGFloat = baseView.frame.width * currentImageDimensions.height / currentImageDimensions.width
+            return CGRect(x: 0, y: (baseView.frame.height - fixedHeight) / 2, width: baseView.frame.width, height: fixedHeight)
+        }
+        let fixedWidth: CGFloat = baseView.frame.height * currentImageDimensions.width / currentImageDimensions.height
+        return CGRect(x: (baseView.frame.width - fixedWidth) / 2, y: 0, width: fixedWidth, height: baseView.frame.height)
+    }
 
     private func setupFocusIndicator() {
-        focusIndicator.frame = CGRect(x: 0, y: 0, width: baseView.bounds.width * 0.3, height: baseView.bounds.width * 0.3)
+        focusIndicator.frame = CGRect(x: 0, y: 0, width: previewLayerView.bounds.width * 0.3, height: previewLayerView.bounds.width * 0.3)
         focusIndicator.layer.borderWidth = 1
         focusIndicator.layer.borderColor = UIColor.systemYellow.cgColor
         focusIndicator.isHidden = true
-        baseView.addSubview(focusIndicator)
+        previewLayerView.addSubview(focusIndicator)
     }
 
     // ref: https://qiita.com/jumperson/items/723737ed497fe2c6f2aa
@@ -111,7 +130,7 @@ extension CameraWrapperView {
             guard intensity > 2 else {
                 return
             }
-            adjustAutoFocus(focusPoint: self.baseView.center, focusMode: .continuousAutoFocus, exposeMode: .continuousAutoExposure)
+            adjustAutoFocus(focusPoint: previewLayerView.center, focusMode: .continuousAutoFocus, exposeMode: .continuousAutoExposure)
         }
     }
 }
@@ -131,10 +150,10 @@ extension CameraWrapperView: CameraViewDeinitDelegate {
         UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.5, delay: 0, options: []) {
             debuglog("\(String(describing: Self.self))::\(#function)@\(#line)", level: .dbg)
             self.focusIndicator.frame = CGRect(
-                x: focusPoint.x - (baseView.bounds.width * 0.075),
-                y: focusPoint.y - (baseView.bounds.width * 0.075),
-                width: (baseView.bounds.width * 0.15),
-                height: (baseView.bounds.width * 0.15)
+                x: focusPoint.x - (previewLayerView.bounds.width * 0.075),
+                y: focusPoint.y - (previewLayerView.bounds.width * 0.075),
+                width: (previewLayerView.bounds.width * 0.15),
+                height: (previewLayerView.bounds.width * 0.15)
             )
         } completion: { (UIViewAnimatingPosition) in
             debuglog("\(String(describing: Self.self))::\(#function)@\(#line)", level: .dbg)
@@ -142,8 +161,8 @@ extension CameraWrapperView: CameraViewDeinitDelegate {
                 debuglog("\(String(describing: Self.self))::\(#function)@\(#line)", level: .dbg)
                 focusIndicator.isHidden = true
                 focusIndicator.frame.size = CGSize(
-                    width: baseView.bounds.width * 0.3,
-                    height:baseView.bounds.width * 0.3
+                    width: previewLayerView.bounds.width * 0.3,
+                    height: previewLayerView.bounds.width * 0.3
                 )
             }
         }
@@ -196,7 +215,8 @@ extension CameraWrapperView: CameraViewDeinitDelegate {
                 , level: .err)
             return
         }
-        // todo: adjust base view and preview layer aspect
-        previewLayer.frame = baseView.frame
+        let layerFrame = calcLayerFrame()
+        previewLayerView.frame = layerFrame
+        previewLayer.frame = CGRect(origin: .zero, size: layerFrame.size)
     }
 }
