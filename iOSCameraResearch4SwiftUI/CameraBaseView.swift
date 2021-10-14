@@ -1,7 +1,9 @@
 import SwiftUI
 
 struct CameraBaseView: View {
-    @EnvironmentObject var cameraVM: CameraViewModel
+    @ObservedObject var cameraVM: CameraViewModel = CameraViewModel(defaultCameraSide: .back, frontCameraMode: nil, backCameraMode: .normalWideAngle)
+    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    @State var orientation: UIDeviceOrientation = UIDevice.current.fixedOrientation
 
     var body: some View {
         GeometryReader { geometry in
@@ -12,7 +14,7 @@ struct CameraBaseView: View {
                     HStack(alignment: .top) {
                         Spacer()
                         Button(action: {
-                            cameraVM.isShooting = false
+                            presentationMode.wrappedValue.dismiss()
                         }) {
                             Image(systemName: "multiply")
                                 .foregroundColor(.white)
@@ -23,7 +25,10 @@ struct CameraBaseView: View {
                     Spacer()
                 }
 
-                if cameraVM.fixedOrientation == .landscapeLeft {
+                if orientation == .landscapeLeft {
+                    debuglogAtView("\(String(describing: Self.self))::\(#function)@line\(#line)"
+                        + "\nlandscapeLeft"
+                        , level: .dbg)
                     HStack {
                         Spacer()
                         Button(action: {
@@ -35,17 +40,25 @@ struct CameraBaseView: View {
                                 .padding(10)
                         }
                     }
-                } else if cameraVM.fixedOrientation == .landscapeRight {
-                    Button(action: {
-                        cameraVM.shooting()
-                    }) {
-                        Circle()
-                            .fill(Color.white)
-                            .frame(width: 50, height: 50)
-                            .padding(10)
+                } else if orientation == .landscapeRight {
+                    debuglogAtView("\(String(describing: Self.self))::\(#function)@line\(#line)"
+                        + "\nlandscapeRight"
+                        , level: .dbg)
+                    HStack {
+                        Button(action: {
+                            cameraVM.shooting()
+                        }) {
+                            Circle()
+                                .fill(Color.white)
+                                .frame(width: 50, height: 50)
+                                .padding(10)
+                        }
+                        Spacer()
                     }
-                    Spacer()
                 } else {
+                    debuglogAtView("\(String(describing: Self.self))::\(#function)@line\(#line)"
+                        + "\nportrait"
+                        , level: .dbg)
                     VStack {
                         Spacer()
                         Button(action: {
@@ -59,6 +72,14 @@ struct CameraBaseView: View {
                     }
                 }
             }
+                .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { orientation in
+                    debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
+                        + "\norientation: \(orientation)"
+                        + "\nUIDevice.current.orientation: \(UIDevice.current.orientation)"
+                        + "\nUIDevice.current.fixedOrientation: \(UIDevice.current.fixedOrientation)"
+                        , level: .dbg)
+                    self.orientation = UIDevice.current.fixedOrientation
+                }
         }
             .background(Color.black)
     }

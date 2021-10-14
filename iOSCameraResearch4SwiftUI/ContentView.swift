@@ -2,16 +2,17 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject var viewModel: CameraViewModel = CameraViewModel(defaultCameraSide: .back, frontCameraMode: nil, backCameraMode: .normalWideAngle)
+    @State var isShooting = false
+
     var body: some View {
         Button(action: {
-            viewModel.isShooting = true
+            isShooting = true
         }) {
             Text("Let's shooting!")
                 .padding()
         }
-        .fullScreenCover(isPresented: $viewModel.isShooting) {
-            CameraBaseView().environmentObject(viewModel)
+        .fullScreenCover(isPresented: $isShooting) {
+            CameraBaseView()
         }
     }
 }
