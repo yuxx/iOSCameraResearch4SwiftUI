@@ -7,30 +7,30 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		507F8042A7DE3429A854BF58 /* CameraWrapperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507F8F95C490AF1F341380FB /* CameraWrapperView.swift */; };
-		507F86D660F361CA61F021A4 /* UIDeviceOrientation+extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507F8180CFB7546523C8E7F2 /* UIDeviceOrientation+extension.swift */; };
-		507F8892A6D5962B66FF5A41 /* CameraBaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507F873B1790CF5C8635A556 /* CameraBaseView.swift */; };
-		507F88EB1CC383061C8E0AB3 /* UIDevice+extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507F8BC8CEDE055EDEAA5F23 /* UIDevice+extension.swift */; };
-		507F891F1BCF89C996FC954E /* AVCaptureVideoOrientation+extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507F8EFA8AB2479CE6A5586C /* AVCaptureVideoOrientation+extension.swift */; };
-		507F8C1E57E62CB0732EC587 /* CameraViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507F855E354D1F0C7D22A655 /* CameraViewModel.swift */; };
-		507F8D7F763B8B25CDF18E04 /* DebugLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507F8417404B0E5C3859536F /* DebugLog.swift */; };
-		5D9C4B75271021FF00B9195A /* iOSCameraResearch4SwiftUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D9C4B74271021FF00B9195A /* iOSCameraResearch4SwiftUIApp.swift */; };
-		5D9C4B77271021FF00B9195A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D9C4B76271021FF00B9195A /* ContentView.swift */; };
+		507F8144B58CB3A8B2F4BA3A /* iOSCameraResearch4SwiftUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507F8BE2B72F324AE7190937 /* iOSCameraResearch4SwiftUIApp.swift */; };
+		507F8194ACC998561E51AA1C /* AVCaptureVideoOrientation+extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507F8EACC8B7DAB8A7C346F9 /* AVCaptureVideoOrientation+extension.swift */; };
+		507F82D31BA9AA7423326B4B /* CameraWrapperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507F82A3B3C6F4387555F80B /* CameraWrapperView.swift */; };
+		507F835B04A5B1A4C008D7F8 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507F807603C13EE899EBAE2D /* ContentView.swift */; };
+		507F83AD2610926CFCD924FB /* DebugLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507F8A5ED6D3C955B499F5C4 /* DebugLog.swift */; };
+		507F850A9B5A2DB6B71618BD /* UIDevice+extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507F8AE94B437CCAFE2DF734 /* UIDevice+extension.swift */; };
+		507F8A1EDFBEA2104D3740AD /* UIDeviceOrientation+extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507F8815A4A581165D9006FA /* UIDeviceOrientation+extension.swift */; };
+		507F8C42589D72F76792B020 /* CameraViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507F8B1DDBA051E8CFB617D3 /* CameraViewModel.swift */; };
+		507F8C89D4B7BFB9F07ABDAF /* CameraBaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507F8F6B0F80887F11EE8BED /* CameraBaseView.swift */; };
 		5D9C4B792710220200B9195A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5D9C4B782710220200B9195A /* Assets.xcassets */; };
 		5D9C4B7C2710220200B9195A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5D9C4B7B2710220200B9195A /* Preview Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		507F8180CFB7546523C8E7F2 /* UIDeviceOrientation+extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIDeviceOrientation+extension.swift"; sourceTree = "<group>"; };
-		507F8417404B0E5C3859536F /* DebugLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DebugLog.swift; sourceTree = "<group>"; };
-		507F855E354D1F0C7D22A655 /* CameraViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraViewModel.swift; sourceTree = "<group>"; };
-		507F873B1790CF5C8635A556 /* CameraBaseView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraBaseView.swift; sourceTree = "<group>"; };
-		507F8BC8CEDE055EDEAA5F23 /* UIDevice+extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIDevice+extension.swift"; sourceTree = "<group>"; };
-		507F8EFA8AB2479CE6A5586C /* AVCaptureVideoOrientation+extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AVCaptureVideoOrientation+extension.swift"; sourceTree = "<group>"; };
-		507F8F95C490AF1F341380FB /* CameraWrapperView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraWrapperView.swift; sourceTree = "<group>"; };
+		507F807603C13EE899EBAE2D /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		507F82A3B3C6F4387555F80B /* CameraWrapperView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraWrapperView.swift; sourceTree = "<group>"; };
+		507F8815A4A581165D9006FA /* UIDeviceOrientation+extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIDeviceOrientation+extension.swift"; sourceTree = "<group>"; };
+		507F8A5ED6D3C955B499F5C4 /* DebugLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DebugLog.swift; sourceTree = "<group>"; };
+		507F8AE94B437CCAFE2DF734 /* UIDevice+extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIDevice+extension.swift"; sourceTree = "<group>"; };
+		507F8B1DDBA051E8CFB617D3 /* CameraViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraViewModel.swift; sourceTree = "<group>"; };
+		507F8BE2B72F324AE7190937 /* iOSCameraResearch4SwiftUIApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = iOSCameraResearch4SwiftUIApp.swift; sourceTree = "<group>"; };
+		507F8EACC8B7DAB8A7C346F9 /* AVCaptureVideoOrientation+extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AVCaptureVideoOrientation+extension.swift"; sourceTree = "<group>"; };
+		507F8F6B0F80887F11EE8BED /* CameraBaseView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraBaseView.swift; sourceTree = "<group>"; };
 		5D9C4B71271021FF00B9195A /* iOSCameraResearch4SwiftUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOSCameraResearch4SwiftUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		5D9C4B74271021FF00B9195A /* iOSCameraResearch4SwiftUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSCameraResearch4SwiftUIApp.swift; sourceTree = "<group>"; };
-		5D9C4B76271021FF00B9195A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		5D9C4B782710220200B9195A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5D9C4B7B2710220200B9195A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		5D9C4B98271046CB00B9195A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -47,6 +47,52 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		507F892A9A4542298D81C184 /* CameraBaseView */ = {
+			isa = PBXGroup;
+			children = (
+				507F8F6B0F80887F11EE8BED /* CameraBaseView.swift */,
+				507F8B1DDBA051E8CFB617D3 /* CameraViewModel.swift */,
+				507F82A3B3C6F4387555F80B /* CameraWrapperView.swift */,
+			);
+			path = CameraBaseView;
+			sourceTree = "<group>";
+		};
+		507F8996C322EB89D902647B /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				507F8AE94B437CCAFE2DF734 /* UIDevice+extension.swift */,
+				507F8815A4A581165D9006FA /* UIDeviceOrientation+extension.swift */,
+				507F8EACC8B7DAB8A7C346F9 /* AVCaptureVideoOrientation+extension.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		507F89C7D2B789AB31C99983 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				507F8A5ED6D3C955B499F5C4 /* DebugLog.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		507F8C0EE2EC93554C930107 /* Scenes */ = {
+			isa = PBXGroup;
+			children = (
+				507F8F9634132D88A339AEA0 /* ContentView */,
+				507F8BE2B72F324AE7190937 /* iOSCameraResearch4SwiftUIApp.swift */,
+			);
+			path = Scenes;
+			sourceTree = "<group>";
+		};
+		507F8F9634132D88A339AEA0 /* ContentView */ = {
+			isa = PBXGroup;
+			children = (
+				507F807603C13EE899EBAE2D /* ContentView.swift */,
+				507F892A9A4542298D81C184 /* CameraBaseView */,
+			);
+			path = ContentView;
+			sourceTree = "<group>";
+		};
 		5D9C4B68271021FF00B9195A = {
 			isa = PBXGroup;
 			children = (
@@ -67,17 +113,11 @@
 			isa = PBXGroup;
 			children = (
 				5D9C4B98271046CB00B9195A /* Info.plist */,
-				5D9C4B74271021FF00B9195A /* iOSCameraResearch4SwiftUIApp.swift */,
-				5D9C4B76271021FF00B9195A /* ContentView.swift */,
 				5D9C4B782710220200B9195A /* Assets.xcassets */,
 				5D9C4B7A2710220200B9195A /* Preview Content */,
-				507F873B1790CF5C8635A556 /* CameraBaseView.swift */,
-				507F8F95C490AF1F341380FB /* CameraWrapperView.swift */,
-				507F855E354D1F0C7D22A655 /* CameraViewModel.swift */,
-				507F8417404B0E5C3859536F /* DebugLog.swift */,
-				507F8BC8CEDE055EDEAA5F23 /* UIDevice+extension.swift */,
-				507F8180CFB7546523C8E7F2 /* UIDeviceOrientation+extension.swift */,
-				507F8EFA8AB2479CE6A5586C /* AVCaptureVideoOrientation+extension.swift */,
+				507F8996C322EB89D902647B /* Extensions */,
+				507F89C7D2B789AB31C99983 /* Utilities */,
+				507F8C0EE2EC93554C930107 /* Scenes */,
 			);
 			path = iOSCameraResearch4SwiftUI;
 			sourceTree = "<group>";
@@ -160,15 +200,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5D9C4B77271021FF00B9195A /* ContentView.swift in Sources */,
-				5D9C4B75271021FF00B9195A /* iOSCameraResearch4SwiftUIApp.swift in Sources */,
-				507F8892A6D5962B66FF5A41 /* CameraBaseView.swift in Sources */,
-				507F8042A7DE3429A854BF58 /* CameraWrapperView.swift in Sources */,
-				507F8C1E57E62CB0732EC587 /* CameraViewModel.swift in Sources */,
-				507F8D7F763B8B25CDF18E04 /* DebugLog.swift in Sources */,
-				507F88EB1CC383061C8E0AB3 /* UIDevice+extension.swift in Sources */,
-				507F86D660F361CA61F021A4 /* UIDeviceOrientation+extension.swift in Sources */,
-				507F891F1BCF89C996FC954E /* AVCaptureVideoOrientation+extension.swift in Sources */,
+				507F850A9B5A2DB6B71618BD /* UIDevice+extension.swift in Sources */,
+				507F8A1EDFBEA2104D3740AD /* UIDeviceOrientation+extension.swift in Sources */,
+				507F8194ACC998561E51AA1C /* AVCaptureVideoOrientation+extension.swift in Sources */,
+				507F83AD2610926CFCD924FB /* DebugLog.swift in Sources */,
+				507F835B04A5B1A4C008D7F8 /* ContentView.swift in Sources */,
+				507F8C89D4B7BFB9F07ABDAF /* CameraBaseView.swift in Sources */,
+				507F8C42589D72F76792B020 /* CameraViewModel.swift in Sources */,
+				507F82D31BA9AA7423326B4B /* CameraWrapperView.swift in Sources */,
+				507F8144B58CB3A8B2F4BA3A /* iOSCameraResearch4SwiftUIApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
