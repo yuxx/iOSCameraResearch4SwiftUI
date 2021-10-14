@@ -80,6 +80,9 @@ final class CameraViewModel: NSObject, ObservableObject {
 
     @objc private func onOrientationChanged() {
         let orientation = UIDevice.current.orientation
+        debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
+            + "\norientation: \(orientation)"
+            , level: .err)
         guard orientation == .portrait || orientation == .landscapeLeft || orientation == .landscapeRight else {
             debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
                 + "\nupside down is not supported."
@@ -87,7 +90,7 @@ final class CameraViewModel: NSObject, ObservableObject {
                 , level: .err)
             return
         }
-        adjustOrientationForAVCaptureVideoOrientation()
+        applyOrientationToAVCaptureVideoOrientation()
 
         if let cameraViewDeinitDelegate = cameraViewDeinitDelegate {
             cameraViewDeinitDelegate.resetPreviewLayerFrame()
@@ -95,6 +98,7 @@ final class CameraViewModel: NSObject, ObservableObject {
     }
 
     deinit {
+        debuglog("\(String(describing: Self.self))::\(#function)@\(#line)", level: .dbg)
         if let cameraViewDeinitDelegate = cameraViewDeinitDelegate {
             cameraViewDeinitDelegate.deinitProc()
         }
@@ -268,40 +272,29 @@ extension CameraViewModel: AVCapturePhotoCaptureDelegate {
 
 // MARK: adjust orientation stuff
 extension CameraViewModel {
-    func adjustOrientationForAVCaptureVideoOrientation() {
-        let newOrientation: AVCaptureVideoOrientation = {
-            switch UIDevice.current.orientation {
-            case .portrait:
-                return .portrait
-            case .portraitUpsideDown:
-                return .portraitUpsideDown
-            case .landscapeLeft:
-                // NOTE: カメラ左右はデバイスの向きと逆
-                return .landscapeRight
-            case .landscapeRight:
-                // NOTE: カメラ左右はデバイスの向きと逆
-                return .landscapeLeft
-            default:
-                debuglog("\(String(describing: Self.self))::\(#function)@\(#line)\tlastOrientation: \(currentOrientation)", level: .dbg)
-                return currentOrientation
-            }
-        }()
+    func applyOrientationToAVCaptureVideoOrientation() {
+        let newOrientation: AVCaptureVideoOrientation = fixedAVCaptureVideoOrientation
+        debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
+            + "\ncurrentOrientation: \(currentOrientation)"
+            + "\nnewOrientation: \(newOrientation)"
+            , level: .err)
         currentOrientation = newOrientation
     }
-    var fixedOrientation: UIDeviceOrientation {
-        switch currentOrientation {
+    var fixedAVCaptureVideoOrientation: AVCaptureVideoOrientation {
+        switch UIDevice.current.fixedOrientation {
         case .portrait:
             return .portrait
         case .portraitUpsideDown:
             return .portraitUpsideDown
-        case .landscapeRight:
-            // NOTE: デバイスの向きはカメラの左右と逆
-            return .landscapeLeft
         case .landscapeLeft:
-            // NOTE: デバイスの向きはカメラの左右と逆
+            // NOTE: カメラ左右はデバイスの向きと逆
             return .landscapeRight
-        @unknown default:
-            return .portrait
+        case .landscapeRight:
+            // NOTE: カメラ左右はデバイスの向きと逆
+            return .landscapeLeft
+        default:
+            debuglog("\(String(describing: Self.self))::\(#function)@\(#line)\tlastOrientation: \(currentOrientation)", level: .dbg)
+            return currentOrientation
         }
     }
     // ref: https://stackoverflow.com/a/35490266/15474670

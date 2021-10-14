@@ -57,16 +57,13 @@ extension CameraWrapperView {
         let newPreviewLayer = AVCaptureVideoPreviewLayer(session: cameraVM.captureSession)
         newPreviewLayer.videoGravity = .resizeAspect
         debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
-            + "\nbaseView.frame:\t\(baseView.frame)"
-            + "\nbaseView.bounds:\t\(baseView.bounds)"
-            + "\npreviewLayerView.frame:\t\(previewLayerView.frame)"
-            + "\npreviewLayerView.bounds:\t\(previewLayerView.bounds)"
-            + "\nnewPreviewLayer.frame:\t\(newPreviewLayer.frame)"
-            + "\nnewPreviewLayer.bounds:\t\(newPreviewLayer.bounds)"
+            + "\n\tbaseView.frame:\t\(baseView.frame)"
+            + "\n\tbaseView.bounds:\t\(baseView.bounds)"
+            + "\n\tpreviewLayerView.frame:\t\(previewLayerView.frame)"
+            + "\n\tpreviewLayerView.bounds:\t\(previewLayerView.bounds)"
+            + "\n\tnewPreviewLayer.frame:\t\(newPreviewLayer.frame)"
+            + "\n\tnewPreviewLayer.bounds:\t\(newPreviewLayer.bounds)"
             , level: .dbg)
-        let layerFrame = calcLayerFrame()
-        previewLayerView.frame = layerFrame
-        newPreviewLayer.frame = CGRect(origin: .zero, size: layerFrame.size)
         if let previewLayer = cameraVM.previewLayer {
             debuglog("\(String(describing: Self.self))::\(#function)@\(#line)", level: .dbg)
             previewLayerView.layer.replaceSublayer(previewLayer, with: newPreviewLayer)
@@ -76,15 +73,36 @@ extension CameraWrapperView {
             previewLayerView.layer.insertSublayer(newPreviewLayer, at: 0)
         }
         cameraVM.previewLayer = newPreviewLayer
-        cameraVM.adjustOrientationForAVCaptureVideoOrientation()
+        cameraVM.applyOrientationToAVCaptureVideoOrientation()
+        resetPreviewLayerFrame()
+        debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
+            + "\n\tbaseView.frame:\t\(baseView.frame)"
+            + "\n\tbaseView.bounds:\t\(baseView.bounds)"
+            + "\n\tpreviewLayerView.frame:\t\(previewLayerView.frame)"
+            + "\n\tpreviewLayerView.bounds:\t\(previewLayerView.bounds)"
+            + "\n\tnewPreviewLayer.frame:\t\(newPreviewLayer.frame)"
+            + "\n\tnewPreviewLayer.bounds:\t\(newPreviewLayer.bounds)"
+            , level: .dbg)
     }
+
     private func calcLayerFrame() -> CGRect {
         let currentImageDimensions = cameraVM.captureResolution
-        guard cameraVM.fixedOrientation == .landscapeRight || cameraVM.fixedOrientation == .landscapeLeft else {
+        debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
+            + "\n\tcurrentImageDimensions:\t\(currentImageDimensions)"
+            , level: .dbg)
+        guard UIDevice.current.fixedOrientation == .landscapeRight || UIDevice.current.fixedOrientation == .landscapeLeft else {
             let fixedHeight: CGFloat = baseView.frame.width * currentImageDimensions.height / currentImageDimensions.width
+            debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
+                + "\n\tportrait (UIDevice.current.fixedOrientation: \(UIDevice.current.fixedOrientation))"
+                + "\n\tCGRect(x: 0, y: \((baseView.frame.height - fixedHeight) / 2), width: \(baseView.frame.width), height: \(fixedHeight)"
+                , level: .dbg)
             return CGRect(x: 0, y: (baseView.frame.height - fixedHeight) / 2, width: baseView.frame.width, height: fixedHeight)
         }
         let fixedWidth: CGFloat = baseView.frame.height * currentImageDimensions.width / currentImageDimensions.height
+        debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
+            + "\n\tlandscape (UIDevice.current.fixedOrientation: \(UIDevice.current.fixedOrientation))"
+            + "\n\tCGRect(x: \((baseView.frame.width - fixedWidth) / 2), y: 0, width: \(fixedWidth), height: \(baseView.frame.height))"
+            , level: .dbg)
         return CGRect(x: (baseView.frame.width - fixedWidth) / 2, y: 0, width: fixedWidth, height: baseView.frame.height)
     }
 
