@@ -4,16 +4,20 @@ import UIKit
 import CoreMotion
 import SwiftUI
 
-protocol CameraViewDeinitDelegate {
+protocol CameraWrapperViewDelegate {
     func deinitProc() -> Void
     func adjustAutoFocus(focusPoint: CGPoint, focusMode: AVCaptureDevice.FocusMode, exposeMode: AVCaptureDevice.ExposureMode)
     func resetPreviewLayerFrame()
 }
 
-final class CameraViewModel: NSObject, ObservableObject {
+final class CameraWrapperViewModel: NSObject, ObservableObject {
     @Published var isShooting: Bool = false {
         didSet {
-            previewLayer = nil
+            if !isShooting {
+                debuglog("\(String(describing: Self.self))::\(#function)@line\(#line)", level: .dbg)
+                previewLayer = nil
+                NotificationCenter.default.removeObserver(self, name: UIDevice.orientationDidChangeNotification, object: nil)
+            }
         }
     }
     private var defaultCameraSide: CameraSide
@@ -41,7 +45,7 @@ final class CameraViewModel: NSObject, ObservableObject {
         }
     }
 
-    var cameraViewDeinitDelegate: CameraViewDeinitDelegate?
+    var cameraWrapperViewDelegate: CameraWrapperViewDelegate?
 
     init(defaultCameraSide: CameraSide, frontCameraMode: FrontCameraMode?, backCameraMode: BackCameraMode?) {
         debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
@@ -82,31 +86,31 @@ final class CameraViewModel: NSObject, ObservableObject {
         let orientation = UIDevice.current.orientation
         debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
             + "\norientation: \(orientation)"
-            , level: .err)
+            , level: .dbg)
         guard orientation == .portrait || orientation == .landscapeLeft || orientation == .landscapeRight else {
             debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
                 + "\nupside down is not supported."
                 + "\norientation: \(orientation)"
-                , level: .err)
+                , level: .dbg)
             return
         }
         applyOrientationToAVCaptureVideoOrientation()
 
-        if let cameraViewDeinitDelegate = cameraViewDeinitDelegate {
+        if let cameraViewDeinitDelegate = cameraWrapperViewDelegate {
             cameraViewDeinitDelegate.resetPreviewLayerFrame()
         }
     }
 
     deinit {
         debuglog("\(String(describing: Self.self))::\(#function)@\(#line)", level: .dbg)
-        if let cameraViewDeinitDelegate = cameraViewDeinitDelegate {
+        if let cameraViewDeinitDelegate = cameraWrapperViewDelegate {
             cameraViewDeinitDelegate.deinitProc()
         }
     }
 }
 
 // MARK: init stuff
-extension CameraViewModel {
+extension CameraWrapperViewModel {
     private func setupAVCaptureDevice() {
         debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
             + "\nAVCaptureDevice.DeviceType"
@@ -222,7 +226,7 @@ extension CameraViewModel {
 }
 
 // MARK: shooting stuff
-extension CameraViewModel {
+extension CameraWrapperViewModel {
     func shooting() {
         let settings = AVCapturePhotoSettings()
         // NOTE: オートフラッシュ
@@ -240,7 +244,7 @@ extension CameraViewModel {
     }
 }
 
-extension CameraViewModel: AVCapturePhotoCaptureDelegate {
+extension CameraWrapperViewModel: AVCapturePhotoCaptureDelegate {
     /// 撮影直後のコールバック
     public func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         if let error = error {
@@ -271,17 +275,17 @@ extension CameraViewModel: AVCapturePhotoCaptureDelegate {
 }
 
 // MARK: adjust orientation stuff
-extension CameraViewModel {
+extension CameraWrapperViewModel {
     func applyOrientationToAVCaptureVideoOrientation() {
         let newOrientation: AVCaptureVideoOrientation = fixedAVCaptureVideoOrientation
         debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
             + "\ncurrentOrientation: \(currentOrientation)"
             + "\nnewOrientation: \(newOrientation)"
-            , level: .err)
+            , level: .dbg)
         currentOrientation = newOrientation
     }
     var fixedAVCaptureVideoOrientation: AVCaptureVideoOrientation {
-        switch UIDevice.current.fixedOrientation {
+        switch UIDevice.current.statusBarOrientation {
         case .portrait:
             return .portrait
         case .portraitUpsideDown:
@@ -293,7 +297,7 @@ extension CameraViewModel {
             // NOTE: カメラ左右はデバイスの向きと逆
             return .landscapeLeft
         default:
-            debuglog("\(String(describing: Self.self))::\(#function)@\(#line)\tlastOrientation: \(currentOrientation)", level: .dbg)
+            debuglog("\(String(describing: Self.self))::\(#function)@\(#line)\tcurrentOrientation: \(currentOrientation)", level: .dbg)
             return currentOrientation
         }
     }
@@ -311,15 +315,38 @@ extension CameraViewModel {
     }
 }
 
+extension CameraWrapperViewModel {
+    func calcLayerFrame(baseViewSize: CGSize) -> CGRect {
+        let currentImageDimensions = captureResolution
+        debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
+            + "\n\tcurrentImageDimensions:\t\(currentImageDimensions)"
+            , level: .dbg)
+        guard UIDevice.current.statusBarOrientation == .landscapeRight || UIDevice.current.statusBarOrientation == .landscapeLeft else {
+            let fixedHeight: CGFloat = baseViewSize.width * currentImageDimensions.height / currentImageDimensions.width
+            debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
+                + "\n\tportrait (UIDevice.current.fixedOrientation: \(UIDevice.current.statusBarOrientation))"
+                + "\n\tCGRect(x: 0, y: \((baseViewSize.height - fixedHeight) / 2), width: \(baseViewSize.width), height: \(fixedHeight)"
+                , level: .dbg)
+            return CGRect(x: 0, y: (baseViewSize.height - fixedHeight) / 2, width: baseViewSize.width, height: fixedHeight)
+        }
+        let fixedWidth: CGFloat = baseViewSize.height * currentImageDimensions.width / currentImageDimensions.height
+        debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
+            + "\n\tlandscape (UIDevice.current.fixedOrientation: \(UIDevice.current.statusBarOrientation))"
+            + "\n\tCGRect(x: \((baseViewSize.width - fixedWidth) / 2), y: 0, width: \(fixedWidth), height: \(baseViewSize.height))"
+            , level: .dbg)
+        return CGRect(x: (baseViewSize.width - fixedWidth) / 2, y: 0, width: fixedWidth, height: baseViewSize.height)
+    }
+}
+
 // MARK: gesture stuff
-extension CameraViewModel {
+extension CameraWrapperViewModel {
     @objc func tapGesture(_ gesture: UITapGestureRecognizer) {
         let tappedPoint = gesture.location(in: gesture.view)
         debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
             + "\ngesture.view?.frame: \(gesture.view?.frame)"
             + "\ntappedPoint: \(tappedPoint)"
             , level: .dbg)
-        if let cameraViewDeinitDelegate = cameraViewDeinitDelegate {
+        if let cameraViewDeinitDelegate = cameraWrapperViewDelegate {
             cameraViewDeinitDelegate.adjustAutoFocus(focusPoint: tappedPoint, focusMode: .autoFocus, exposeMode: .autoExpose)
         }
     }
@@ -387,14 +414,14 @@ extension CameraViewModel {
 }
 
 
-extension CameraViewModel {
+extension CameraWrapperViewModel {
     enum CameraSide {
         case front
             , back
     }
 }
 
-extension CameraViewModel {
+extension CameraWrapperViewModel {
     enum FrontCameraMode {
         case normalWideAngle
             , trueDepth
@@ -409,7 +436,7 @@ extension CameraViewModel {
     }
 }
 
-extension CameraViewModel {
+extension CameraWrapperViewModel {
     enum BackCameraMode {
         case normalWideAngle
             , dual

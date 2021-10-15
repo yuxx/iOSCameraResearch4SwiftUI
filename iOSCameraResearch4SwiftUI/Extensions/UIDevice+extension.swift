@@ -1,7 +1,7 @@
 import UIKit
 
 extension UIDevice {
-    var fixedOrientation: UIDeviceOrientation {
+    var statusBarOrientation: UIDeviceOrientation {
         let currentOrientation = UIDevice.current.orientation
         switch currentOrientation {
         case .portrait, .portraitUpsideDown, .landscapeLeft, .landscapeRight:

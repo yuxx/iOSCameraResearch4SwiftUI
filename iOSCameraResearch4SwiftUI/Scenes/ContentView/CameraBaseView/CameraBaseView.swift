@@ -1,9 +1,9 @@
 import SwiftUI
 
 struct CameraBaseView: View {
-    @ObservedObject var cameraVM: CameraViewModel = CameraViewModel(defaultCameraSide: .back, frontCameraMode: nil, backCameraMode: .normalWideAngle)
+    @ObservedObject var cameraVM: CameraWrapperViewModel = CameraWrapperViewModel(defaultCameraSide: .back, frontCameraMode: nil, backCameraMode: .normalWideAngle)
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-    @State var orientation: UIDeviceOrientation = UIDevice.current.fixedOrientation
+    @State var orientation: UIDeviceOrientation = UIDevice.current.statusBarOrientation
 
     var body: some View {
         GeometryReader { geometry in
@@ -76,9 +76,9 @@ struct CameraBaseView: View {
                     debuglog("\(String(describing: Self.self))::\(#function)@\(#line)"
                         + "\norientation: \(orientation)"
                         + "\nUIDevice.current.orientation: \(UIDevice.current.orientation)"
-                        + "\nUIDevice.current.fixedOrientation: \(UIDevice.current.fixedOrientation)"
+                        + "\nUIDevice.current.fixedOrientation: \(UIDevice.current.statusBarOrientation)"
                         , level: .dbg)
-                    self.orientation = UIDevice.current.fixedOrientation
+                    self.orientation = UIDevice.current.statusBarOrientation
                 }
         }
             .background(Color.black)
@@ -86,7 +86,7 @@ struct CameraBaseView: View {
 }
 
 struct CameraBaseView_Previews: PreviewProvider {
-    static let cameraVM: CameraViewModel = CameraViewModel(defaultCameraSide: .back, frontCameraMode: nil, backCameraMode: .normalWideAngle)
+    static let cameraVM: CameraWrapperViewModel = CameraWrapperViewModel(defaultCameraSide: .back, frontCameraMode: nil, backCameraMode: .normalWideAngle)
     static var previews: some View {
         CameraBaseView().environmentObject(cameraVM)
     }

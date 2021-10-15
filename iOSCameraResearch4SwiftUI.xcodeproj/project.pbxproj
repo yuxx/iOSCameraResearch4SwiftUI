@@ -14,7 +14,7 @@
 		507F83AD2610926CFCD924FB /* DebugLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507F8A5ED6D3C955B499F5C4 /* DebugLog.swift */; };
 		507F850A9B5A2DB6B71618BD /* UIDevice+extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507F8AE94B437CCAFE2DF734 /* UIDevice+extension.swift */; };
 		507F8A1EDFBEA2104D3740AD /* UIDeviceOrientation+extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507F8815A4A581165D9006FA /* UIDeviceOrientation+extension.swift */; };
-		507F8C42589D72F76792B020 /* CameraViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507F8B1DDBA051E8CFB617D3 /* CameraViewModel.swift */; };
+		507F8C42589D72F76792B020 /* CameraWrapperViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507F8B1DDBA051E8CFB617D3 /* CameraWrapperViewModel.swift */; };
 		507F8C89D4B7BFB9F07ABDAF /* CameraBaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507F8F6B0F80887F11EE8BED /* CameraBaseView.swift */; };
 		5D9C4B792710220200B9195A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5D9C4B782710220200B9195A /* Assets.xcassets */; };
 		5D9C4B7C2710220200B9195A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5D9C4B7B2710220200B9195A /* Preview Assets.xcassets */; };
@@ -26,7 +26,7 @@
 		507F8815A4A581165D9006FA /* UIDeviceOrientation+extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIDeviceOrientation+extension.swift"; sourceTree = "<group>"; };
 		507F8A5ED6D3C955B499F5C4 /* DebugLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DebugLog.swift; sourceTree = "<group>"; };
 		507F8AE94B437CCAFE2DF734 /* UIDevice+extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIDevice+extension.swift"; sourceTree = "<group>"; };
-		507F8B1DDBA051E8CFB617D3 /* CameraViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraViewModel.swift; sourceTree = "<group>"; };
+		507F8B1DDBA051E8CFB617D3 /* CameraWrapperViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraWrapperViewModel.swift; sourceTree = "<group>"; };
 		507F8BE2B72F324AE7190937 /* iOSCameraResearch4SwiftUIApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = iOSCameraResearch4SwiftUIApp.swift; sourceTree = "<group>"; };
 		507F8EACC8B7DAB8A7C346F9 /* AVCaptureVideoOrientation+extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AVCaptureVideoOrientation+extension.swift"; sourceTree = "<group>"; };
 		507F8F6B0F80887F11EE8BED /* CameraBaseView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraBaseView.swift; sourceTree = "<group>"; };
@@ -51,7 +51,7 @@
 			isa = PBXGroup;
 			children = (
 				507F8F6B0F80887F11EE8BED /* CameraBaseView.swift */,
-				507F8B1DDBA051E8CFB617D3 /* CameraViewModel.swift */,
+				507F8B1DDBA051E8CFB617D3 /* CameraWrapperViewModel.swift */,
 				507F82A3B3C6F4387555F80B /* CameraWrapperView.swift */,
 			);
 			path = CameraBaseView;
@@ -206,7 +206,7 @@
 				507F83AD2610926CFCD924FB /* DebugLog.swift in Sources */,
 				507F835B04A5B1A4C008D7F8 /* ContentView.swift in Sources */,
 				507F8C89D4B7BFB9F07ABDAF /* CameraBaseView.swift in Sources */,
-				507F8C42589D72F76792B020 /* CameraViewModel.swift in Sources */,
+				507F8C42589D72F76792B020 /* CameraWrapperViewModel.swift in Sources */,
 				507F82D31BA9AA7423326B4B /* CameraWrapperView.swift in Sources */,
 				507F8144B58CB3A8B2F4BA3A /* iOSCameraResearch4SwiftUIApp.swift in Sources */,
 			);
